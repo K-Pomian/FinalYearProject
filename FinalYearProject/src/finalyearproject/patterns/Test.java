@@ -2,6 +2,7 @@ package finalyearproject.patterns;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,34 +10,37 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import finalyearproject.utils.TextFileWriter;
+
 public abstract class Test {
 	
 	private WebDriver webDriver;
 	private WebDriverWait waiter;
-	private URL start;
+	private final URL start;
 	private final int timeout = 10;
+	private final Map<String, String> inputData;
 	private Actions actions;
 	
-	abstract protected void runTest();
+	public Test(String url, Map<String, String> inputData) throws MalformedURLException {
+		this.start = new URL(url);
+		this.inputData = inputData;
+	}
 	
-	public void run(String url) {
-		initialize(url);
-		runTest();
+	abstract protected void runTest(Map<String, String> inputData);
+	
+	public void run() {
+		initialize(start.toString());
+		runTest(inputData);
 		finishTest();
 	}
 	
 	private void initialize(String url) {
-		System.setProperty("webdriver.chrome.driver", "C:\\Users\\pomia\\FinalYearProject\\FinalYearProject\\assets\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", "C:\\Users\\pomia\\git\\FinalYearProject\\FinalYearProject\\assets\\chromedriver.exe");
 		this.setWebDriver(new ChromeDriver());
 		this.setWebDriverWait(new WebDriverWait(this.webDriver, timeout));
 		
 		actions = new Actions(this.webDriver);
 		
-		try {
-			this.setUrl(url);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
 		webDriver.get(url);
 	}
 	
@@ -84,7 +88,4 @@ public abstract class Test {
 		return this.start;
 	}
 	
-	private void setUrl(String urlPath) throws MalformedURLException {
-		this.start = new URL(urlPath);
-	}
 }

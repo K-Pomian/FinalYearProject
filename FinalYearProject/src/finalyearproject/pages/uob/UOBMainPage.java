@@ -1,4 +1,4 @@
-package finalyearproject.pages.test01;
+package finalyearproject.pages.uob;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

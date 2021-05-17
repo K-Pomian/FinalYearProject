@@ -1,5 +1,7 @@
 package finalyearproject.tests.uobtests;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,17 +9,22 @@ import java.util.Map;
 import org.openqa.selenium.WebElement;
 
 import finalyearproject.exceptions.ResultMismatchException;
-import finalyearproject.pages.test01.UOBComputerSciencePlacement;
-import finalyearproject.pages.test01.UOBCourseListPage;
-import finalyearproject.pages.test01.UOBMainPage;
-import finalyearproject.pages.test01.UOBStudyPage;
-import finalyearproject.pages.test01.UOBUndergraduatePage;
+import finalyearproject.pages.uob.UOBComputerSciencePlacement;
+import finalyearproject.pages.uob.UOBCourseListPage;
+import finalyearproject.pages.uob.UOBMainPage;
+import finalyearproject.pages.uob.UOBStudyPage;
+import finalyearproject.pages.uob.UOBUndergraduatePage;
 import finalyearproject.patterns.Test;
+import finalyearproject.utils.TextFileWriter;
 
 public class UOBTest01 extends Test {
 
+	public UOBTest01(String url, Map<String, String> inputData) throws MalformedURLException {
+		super(url, inputData);
+	}
+
 	@Override
-	protected void runTest() {
+	protected void runTest(Map<String, String> inputData) {
 		UOBMainPage uobMainPage = new UOBMainPage(getWebDriver(), getWebDriverWait());
 		clickOnElement(uobMainPage.study);
 
@@ -26,7 +33,7 @@ public class UOBTest01 extends Test {
 
 		UOBUndergraduatePage uobUndergraduatePage = new UOBUndergraduatePage(getWebDriver(), getWebDriverWait());
 		scrollToElement(uobUndergraduatePage.searchCourse);
-		sendValueToField(uobUndergraduatePage.searchCourse, "Computer Science");
+		sendValueToField(uobUndergraduatePage.searchCourse, inputData.get("CourseName"));
 		clickOnElement(uobUndergraduatePage.search);
 
 		UOBCourseListPage uobCourseListPage = new UOBCourseListPage(getWebDriver(), getWebDriverWait());
@@ -64,6 +71,13 @@ public class UOBTest01 extends Test {
 
 			requirements.put(requirement, value);
 		});
+		
+		try {
+			TextFileWriter writer = new TextFileWriter(this.getClass().getSimpleName());
+			writer.saveOutputData(requirements);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
