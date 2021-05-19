@@ -1,9 +1,8 @@
 package finalyearproject.utils.enums;
 
-import java.net.URL;
-
 public enum TestType {
-	UOB ("https://www.bradford.ac.uk/external/");
+	UOB ("https://www.bradford.ac.uk/external/"),
+	Evision ("https://evision.brad.ac.uk/");
 	
 	private final String url;
 	

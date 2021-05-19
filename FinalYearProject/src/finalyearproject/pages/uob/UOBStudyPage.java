@@ -8,8 +8,8 @@ import finalyearproject.patterns.WebPage;
 
 public class UOBStudyPage extends WebPage {
 
-	public UOBStudyPage(WebDriver webDriver, WebDriverWait waiter) {
-		super(webDriver, waiter);
+	public UOBStudyPage(WebDriver webDriver) {
+		super(webDriver);
 	}
 	
 	public WebElement undergraduate = this.findElementByXpath("//a[contains(text(), 'Undergraduate')]");

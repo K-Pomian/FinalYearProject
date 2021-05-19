@@ -3,6 +3,7 @@ package finalyearproject.launcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import finalyearproject.tests.evisiontests.EvisionTest01;
 import finalyearproject.tests.uobtests.UOBTest01;
 import finalyearproject.utils.SpreadsheetReader;
 import finalyearproject.utils.TestData;
@@ -16,7 +17,7 @@ public class Launcher {
 		setup();
 
 		try {
-			UOBTest01 test = new UOBTest01(TestType.UOB.getUrl(), testData.getInputs(TestType.UOB));
+			EvisionTest01 test = new EvisionTest01(TestType.Evision.getUrl(), testData.getInputs(TestType.Evision));
 			test.run();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -27,8 +28,6 @@ public class Launcher {
 		try {
 			SpreadsheetReader reader = new SpreadsheetReader();
 			testData = reader.getTestData();
-			testData.getActiveTests().forEach(test -> System.out.println(test.toString()));
-			testData.getInputs(TestType.UOB).forEach((key, value) -> System.out.println(key + ": " + value));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

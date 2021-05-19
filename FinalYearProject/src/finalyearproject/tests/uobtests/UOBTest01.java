@@ -15,7 +15,7 @@ import finalyearproject.pages.uob.UOBMainPage;
 import finalyearproject.pages.uob.UOBStudyPage;
 import finalyearproject.pages.uob.UOBUndergraduatePage;
 import finalyearproject.patterns.Test;
-import finalyearproject.utils.TextFileWriter;
+import finalyearproject.utils.OutputSaver;
 
 public class UOBTest01 extends Test {
 
@@ -25,18 +25,18 @@ public class UOBTest01 extends Test {
 
 	@Override
 	protected void runTest(Map<String, String> inputData) {
-		UOBMainPage uobMainPage = new UOBMainPage(getWebDriver(), getWebDriverWait());
+		UOBMainPage uobMainPage = new UOBMainPage(getWebDriver());
 		clickOnElement(uobMainPage.study);
 
-		UOBStudyPage uobStudyPage = new UOBStudyPage(getWebDriver(), getWebDriverWait());
+		UOBStudyPage uobStudyPage = new UOBStudyPage(getWebDriver());
 		clickOnElement(uobStudyPage.undergraduate);
 
-		UOBUndergraduatePage uobUndergraduatePage = new UOBUndergraduatePage(getWebDriver(), getWebDriverWait());
+		UOBUndergraduatePage uobUndergraduatePage = new UOBUndergraduatePage(getWebDriver());
 		scrollToElement(uobUndergraduatePage.searchCourse);
 		sendValueToField(uobUndergraduatePage.searchCourse, inputData.get("CourseName"));
 		clickOnElement(uobUndergraduatePage.search);
 
-		UOBCourseListPage uobCourseListPage = new UOBCourseListPage(getWebDriver(), getWebDriverWait());
+		UOBCourseListPage uobCourseListPage = new UOBCourseListPage(getWebDriver());
 		String notificationText = uobCourseListPage.notification.getText();
 		int expectedNumberOfResults = Integer.parseInt(notificationText.replaceAll("[^0-9]", ""));
 		int actualNumberOfResults = uobCourseListPage.results.size();
@@ -45,11 +45,9 @@ public class UOBTest01 extends Test {
 			throw new ResultMismatchException("Expected number of results doesn't match acutal number of results");
 		}
 
-		scrollToElement(uobCourseListPage.computerScienceWithPlacement);
 		clickOnElement(uobCourseListPage.computerScienceWithPlacement);
 
-		UOBComputerSciencePlacement uobComputerSciencePlacement = new UOBComputerSciencePlacement(getWebDriver(),
-				getWebDriverWait());
+		UOBComputerSciencePlacement uobComputerSciencePlacement = new UOBComputerSciencePlacement(getWebDriver());
 		
 		int lastIndex = uobComputerSciencePlacement.entryRequirements.size() - 1;
 		scrollToElement(uobComputerSciencePlacement.entryRequirements.get(lastIndex));
@@ -72,9 +70,10 @@ public class UOBTest01 extends Test {
 			requirements.put(requirement, value);
 		});
 		
+		OutputSaver outputSaver = null;
 		try {
-			TextFileWriter writer = new TextFileWriter(this.getClass().getSimpleName());
-			writer.saveOutputData(requirements);
+			outputSaver = new OutputSaver(this.getClass().getSimpleName());
+			outputSaver.saveOutputData(requirements, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

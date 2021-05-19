@@ -13,10 +13,11 @@ public abstract class WebPage {
 	
 	private WebDriver webDriver;
 	private WebDriverWait waiter;
+	private final int timeout = 10;
 	
-	public WebPage(WebDriver webDriver, WebDriverWait waiter) {
+	public WebPage(WebDriver webDriver) {
 		this.webDriver = webDriver;
-		this.waiter = waiter;
+		this.waiter = new WebDriverWait(webDriver, timeout);
 		
 		JavascriptExecutor js = (JavascriptExecutor) this.webDriver;
 		js.executeScript("return document.readyState");

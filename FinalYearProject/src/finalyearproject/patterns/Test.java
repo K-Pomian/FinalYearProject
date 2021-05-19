@@ -1,28 +1,29 @@
 package finalyearproject.patterns;
 
+import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import finalyearproject.utils.TextFileWriter;
 
 public abstract class Test {
 	
 	private WebDriver webDriver;
 	private WebDriverWait waiter;
-	private final URL start;
-	private final int timeout = 10;
+	private final String start;
 	private final Map<String, String> inputData;
 	private Actions actions;
 	
 	public Test(String url, Map<String, String> inputData) throws MalformedURLException {
-		this.start = new URL(url);
+		this.start = url;
 		this.inputData = inputData;
 	}
 	
@@ -37,7 +38,6 @@ public abstract class Test {
 	private void initialize(String url) {
 		System.setProperty("webdriver.chrome.driver", "C:\\Users\\pomia\\git\\FinalYearProject\\FinalYearProject\\assets\\chromedriver.exe");
 		this.setWebDriver(new ChromeDriver());
-		this.setWebDriverWait(new WebDriverWait(this.webDriver, timeout));
 		
 		actions = new Actions(this.webDriver);
 		
@@ -52,12 +52,27 @@ public abstract class Test {
 		actions.click(element).build().perform();
 	}
 	
-	protected void sendValueToField(WebElement element, String value) {
-		actions.sendKeys(element, value).build().perform();
+	protected void scrollDownAndClickOnElement(WebElement element, int pixels) {
+		scrollDown(pixels);
+		clickOnElement(element);
 	}
 	
 	protected void scrollToElement(WebElement element) {
 		actions.moveToElement(element).build().perform();
+	}
+	
+	protected void scrollDown(int pixels) {
+		((JavascriptExecutor) webDriver).executeScript("window.scrollBy(0,arguments[0])", pixels);
+	}
+	
+	protected void sendValueToField(WebElement element, String value) {
+		actions.sendKeys(element, value).build().perform();
+	}
+	
+	public File takeScreenshot(WebElement element) {
+		WrapsDriver wrapsDriver = (WrapsDriver) element;
+		File screenshot = ((TakesScreenshot) wrapsDriver.getWrappedDriver()).getScreenshotAs(OutputType.FILE);
+		return screenshot;
 	}
 	
 	public String getCurrentUrl() {
@@ -80,11 +95,7 @@ public abstract class Test {
 		return this.waiter;
 	}
 	
-	private void setWebDriverWait(WebDriverWait waiter) {
-		this.waiter = waiter;
-	}
-	
-	public URL getStart() {
+	public String getStart() {
 		return this.start;
 	}
 	

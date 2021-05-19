@@ -10,8 +10,8 @@ import finalyearproject.patterns.WebPage;
 
 public class UOBCourseListPage extends WebPage {
 
-	public UOBCourseListPage(WebDriver webDriver, WebDriverWait waiter) {
-		super(webDriver, waiter);
+	public UOBCourseListPage(WebDriver webDriver) {
+		super(webDriver);
 	}
 	
 	public WebElement notification = findElementByXpath("(//span[contains(text(), 'Your search')])[1]");

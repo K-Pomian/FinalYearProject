@@ -10,8 +10,8 @@ import finalyearproject.patterns.WebPage;
 
 public class UOBComputerSciencePlacement extends WebPage {
 
-	public UOBComputerSciencePlacement(WebDriver webDriver, WebDriverWait waiter) {
-		super(webDriver, waiter);
+	public UOBComputerSciencePlacement(WebDriver webDriver) {
+		super(webDriver);
 	}
 	
 	public List<WebElement> entryRequirements = findElementsByXpath("//div[@id='entryReqInner']/div[@class='row']").subList(1, 8);
