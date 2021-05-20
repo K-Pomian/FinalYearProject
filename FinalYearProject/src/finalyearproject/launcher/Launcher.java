@@ -1,13 +1,13 @@
 package finalyearproject.launcher;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
-import finalyearproject.tests.evisiontests.EvisionTest01;
-import finalyearproject.tests.uobtests.UOBTest01;
+import finalyearproject.patterns.Test;
 import finalyearproject.utils.SpreadsheetReader;
 import finalyearproject.utils.TestData;
-import finalyearproject.utils.enums.TestType;
 
 public class Launcher {
 
@@ -16,12 +16,18 @@ public class Launcher {
 	public static void main(String[] args) {
 		setup();
 
-		try {
-			EvisionTest01 test = new EvisionTest01(TestType.Evision.getUrl(), testData.getInputs(TestType.Evision));
-			test.run();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		testData.getActiveTests().forEach(test -> {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<Test> clazz = (Class<Test>) Class.forName("finalyearproject.tests." + test);
+				Constructor<Test> constructor = clazz.getConstructor(String.class, Map.class);
+				constructor.newInstance(testData.getTestTypeForTest(test).getUrl(),
+						testData.getInputs(testData.getTestTypeForTest(test))).run();
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
+					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	private static void setup() {

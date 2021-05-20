@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 import finalyearproject.exceptions.SizeMismatchException;
+import finalyearproject.exceptions.StatusMismatchException;
 import finalyearproject.exceptions.TestTypeMismatchException;
 import finalyearproject.utils.enums.TestType;
 
@@ -35,13 +40,15 @@ public class SpreadsheetReader {
 	}
 	
 	public TestData getTestData() throws IOException {
-		Set<TestType> activeTests = fetchActiveTestTypes();
-		List<Map<String, String>> allInputsForActiveTests = fetchAllInputsForActiveTests(activeTests);
+		Map<String, TestType> activeTestsWithCorrespondingTypes = fetchActiveTests();
+		Set<TestType> activeTypesTests = Sets.newLinkedHashSet(activeTestsWithCorrespondingTypes.values());
+		List<String> activeTests = Lists.newArrayList(activeTestsWithCorrespondingTypes.keySet());
+		List<Map<String, String>> allInputsForActiveTests = fetchAllInputsForActiveTests(activeTypesTests);
 		
-		Iterator<TestType> activeTestsIterator = activeTests.iterator();
+		Iterator<TestType> activeTestsIterator = activeTypesTests.iterator();
 		Iterator<Map<String, String>> allInputsForActiveTestsIterator = allInputsForActiveTests.iterator();
 		
-		if (activeTests.size() != allInputsForActiveTests.size()) {
+		if (activeTypesTests.size() != allInputsForActiveTests.size()) {
 			throw new SizeMismatchException("Size of 'activeTests' is different from size of 'allInputsForActiveTests'");
 		}
 		
@@ -49,6 +56,8 @@ public class SpreadsheetReader {
 			testData.setTestData(activeTestsIterator.next(), allInputsForActiveTestsIterator.next());
 		}
 		
+		testData.setActiveTestsWithCorrespondingTypes(activeTestsWithCorrespondingTypes);
+		testData.setActiveTestTypes(activeTypesTests);
 		testData.setActiveTests(activeTests);
 		
 		close();
@@ -77,27 +86,36 @@ public class SpreadsheetReader {
 		return allInputs;
 	}
 	
-	private Set<TestType> fetchActiveTestTypes() {
+	private Map<String, TestType> fetchActiveTests() {
 		Sheet sheet = workbook.getSheet("ActiveTests");
 		
-		Set<TestType> activeTests = new LinkedHashSet<TestType>();
+		Map<String, TestType> activeTests = new LinkedHashMap<String, TestType>();
 		Iterator<Row> rowIterator = sheet.rowIterator();
 		rowIterator.next();
-		while (rowIterator.hasNext()) {
+		while(rowIterator.hasNext()) {
 			Row currentRow = rowIterator.next();
+			
+			Cell testNameCell = currentRow.getCell(0);
+			String testName = testNameCell.getStringCellValue();
 			
 			Cell testTypeCell = currentRow.getCell(1);
 			String testType = testTypeCell.getStringCellValue();
 			
 			Cell statusCell = currentRow.getCell(2);
-			boolean status = statusCell.getStringCellValue().equals("Active");
+			String status = statusCell.getStringCellValue();
 			
-			if (Arrays.stream(TestType.values()).anyMatch(type -> type.toString().equals(testType))) {
-				if (status) {
-					activeTests.add(TestType.valueOf(testType));
+			switch(status) {
+			case "Active": {
+				if (Arrays.stream(TestType.values()).anyMatch(type -> type.toString().equals(testType))) {
+					activeTests.put(testName, TestType.valueOf(testType));
+				} else {
+					throw new TestTypeMismatchException("Test type " + testType + " is invalid");
 				}
-			} else {
-				throw new TestTypeMismatchException("Test type " + testType + " is invalid");
+			} case "Inactive": {
+				break;
+			} default : {
+				throw new StatusMismatchException("Wrong status of test " + testName);
+			}	
 			}
 		}
 		

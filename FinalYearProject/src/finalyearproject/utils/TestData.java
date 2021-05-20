@@ -11,26 +11,45 @@ import finalyearproject.utils.enums.TestType;
 public class TestData {
 	
 	private Map<TestType, Map<String, String>> data;
-	private List<TestType> activeTests;
+	private Map<String, TestType> activeTestsWithCorrespondingTypes;
+	private List<TestType> activeTestTypes;
+	private List<String> activeTests;
 	
 	protected TestData() {
 		this.data = new HashMap<TestType, Map<String,String>>();
-		this.activeTests = new ArrayList<TestType>();
+		this.activeTestTypes = new ArrayList<TestType>();
+		this.activeTests = new ArrayList<String>();
 	}
 	
 	protected void setTestData(TestType testType, Map<String, String> data) {
 		this.data.put(testType, data);
 	}
 	
-	protected void setActiveTests(Set<TestType> activeTests) {
-		this.activeTests.addAll(activeTests);
+	protected void setActiveTestTypes(Set<TestType> activeTestTypes) {
+		this.activeTestTypes.addAll(activeTestTypes);
 	}
 	
-	public Map<String, String> getInputs(TestType testName) {
-		return data.get(testName);
+	protected void setActiveTests(List<String> activeTests) {
+		this.activeTests = activeTests;
 	}
 	
-	public List<TestType> getActiveTests() {
+	protected void setActiveTestsWithCorrespondingTypes(Map<String, TestType> activeTestsWithCorrespondingTypes) {
+		this.activeTestsWithCorrespondingTypes = activeTestsWithCorrespondingTypes;
+	}
+	
+	public TestType getTestTypeForTest(String test) {
+		return activeTestsWithCorrespondingTypes.get(test);
+	}
+	
+	public Map<String, String> getInputs(TestType testType) {
+		return data.get(testType);
+	}
+	
+	public List<TestType> getActiveTestTypes() {
+		return this.activeTestTypes;
+	}
+	
+	public List<String> getActiveTests() {
 		return this.activeTests;
 	}
 	

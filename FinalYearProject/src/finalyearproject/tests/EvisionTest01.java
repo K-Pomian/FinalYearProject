@@ -1,4 +1,4 @@
-package finalyearproject.tests.evisiontests;
+package finalyearproject.tests;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

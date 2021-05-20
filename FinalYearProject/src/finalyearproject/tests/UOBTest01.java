@@ -1,4 +1,4 @@
-package finalyearproject.tests.uobtests;
+package finalyearproject.tests;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -76,6 +76,14 @@ public class UOBTest01 extends Test {
 			outputSaver.saveOutputData(requirements, false);
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (outputSaver != null) {
+				try {
+					outputSaver.closeTextWriter();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 	}
