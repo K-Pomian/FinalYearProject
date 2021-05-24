@@ -11,7 +11,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public abstract class WebPage {
 	
-	private WebDriver webDriver;
+	protected WebDriver webDriver;
 	private WebDriverWait waiter;
 	private final int timeout = 10;
 	
@@ -47,6 +47,10 @@ public abstract class WebPage {
 		return children;
 	}
 	
+	public WebDriverWait getWaiter() {
+		return this.waiter;
+	}
+	
 	private void waitForElementToLoad(String xpath) {
 		waiter.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
 	}
@@ -60,7 +64,17 @@ public abstract class WebPage {
 	}
 	
 	private void waitForChildrenElementsToLoad(WebElement element, String xpath) {
-		waiter.until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(element, By.xpath(xpath)));
+		waiter.until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(element, By.xpath(xpath))).forEach(listElement -> {
+			waiter.until(ExpectedConditions.elementToBeClickable(listElement));
+		});;
+	}
+	
+	public void waitForElementToLoad(WebElement element) {
+		JavascriptExecutor js = (JavascriptExecutor) this.webDriver;
+		Boolean loaded = (Boolean) js.executeScript("return arguments[0].complete", element);
+		if (!loaded.booleanValue()) {
+			waitForElementToLoad(element);
+		}
 	}
 	
 }

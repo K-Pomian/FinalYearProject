@@ -1,23 +1,25 @@
 package finalyearproject.patterns;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+
+import finalyearproject.exceptions.DimensionMismatchException;
 
 public abstract class Test {
 	
 	private WebDriver webDriver;
-	private WebDriverWait waiter;
 	private final String start;
 	private final Map<String, String> inputData;
 	private Actions actions;
@@ -30,14 +32,20 @@ public abstract class Test {
 	abstract protected void runTest(Map<String, String> inputData);
 	
 	public void run() {
-		initialize(start.toString());
-		runTest(inputData);
-		finishTest();
+		try {
+			initialize(start.toString());
+			runTest(inputData);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			finishTest();
+		}
 	}
 	
 	private void initialize(String url) {
 		System.setProperty("webdriver.chrome.driver", "C:\\Users\\pomia\\git\\FinalYearProject\\FinalYearProject\\assets\\chromedriver.exe");
 		this.setWebDriver(new ChromeDriver());
+		webDriver.manage().window().maximize();
 		
 		actions = new Actions(this.webDriver);
 		
@@ -69,10 +77,34 @@ public abstract class Test {
 		actions.sendKeys(element, value).build().perform();
 	}
 	
-	public File takeScreenshot(WebElement element) {
-		WrapsDriver wrapsDriver = (WrapsDriver) element;
-		File screenshot = ((TakesScreenshot) wrapsDriver.getWrappedDriver()).getScreenshotAs(OutputType.FILE);
+	protected File takeScreenshot(WebElement element) {
+		File screenshot = element.getScreenshotAs(OutputType.FILE);
 		return screenshot;
+	}
+	
+	protected boolean compareImages(File expectedImage, File actualImage) throws IOException {
+		BufferedImage bufferedExpectedImage = ImageIO.read(expectedImage);
+		BufferedImage bufferedActualImage = ImageIO.read(actualImage);
+		
+		int expectedWidth = bufferedExpectedImage.getWidth();
+		int expectedHeight = bufferedExpectedImage.getHeight();
+		
+		int actualWidth = bufferedActualImage.getWidth();
+		int actualHeight = bufferedActualImage.getHeight();
+		
+		if (expectedWidth != actualWidth || expectedHeight != actualHeight) {
+			throw new DimensionMismatchException("Images have different dimensions");
+		}
+		
+		for (int i = 0; i < expectedWidth; i++) {
+			for (int j = 0; j < expectedHeight; j++) {
+				if (bufferedExpectedImage.getRGB(i, j) != bufferedActualImage.getRGB(i, j)) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	public String getCurrentUrl() {
@@ -89,10 +121,6 @@ public abstract class Test {
 	
 	private void setWebDriver(WebDriver webDriver) {
 		this.webDriver = webDriver;
-	}
-	
-	public WebDriverWait getWebDriverWait() {
-		return this.waiter;
 	}
 	
 	public String getStart() {

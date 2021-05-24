@@ -21,8 +21,9 @@ public class Launcher {
 				@SuppressWarnings("unchecked")
 				Class<Test> clazz = (Class<Test>) Class.forName("finalyearproject.tests." + test);
 				Constructor<Test> constructor = clazz.getConstructor(String.class, Map.class);
-				constructor.newInstance(testData.getTestTypeForTest(test).getUrl(),
-						testData.getInputs(testData.getTestTypeForTest(test))).run();
+				Test testInstance = constructor.newInstance(testData.getTestTypeForTest(test).getUrl(),
+						testData.getInputs(testData.getTestTypeForTest(test)));
+				testInstance.run();
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 					| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();

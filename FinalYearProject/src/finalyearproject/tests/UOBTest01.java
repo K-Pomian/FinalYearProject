@@ -73,13 +73,13 @@ public class UOBTest01 extends Test {
 		OutputSaver outputSaver = null;
 		try {
 			outputSaver = new OutputSaver(this.getClass().getSimpleName());
-			outputSaver.saveOutputData(requirements, false);
+			outputSaver.getTextFileWriter().saveOutputData(requirements, false);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (outputSaver != null) {
 				try {
-					outputSaver.closeTextWriter();
+					outputSaver.getTextFileWriter().close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

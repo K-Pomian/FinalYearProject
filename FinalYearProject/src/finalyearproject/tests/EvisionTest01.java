@@ -35,7 +35,7 @@ public class EvisionTest01 extends Test {
 		try {
 			outputSaver = new OutputSaver(EvisionTest01.class.getSimpleName());
 			WebElement imageElement = evisionCoursePage.findChildElementByXpath(evisionCoursePage.courseDetails, ".//img");
-			outputSaver.saveImageFromScreenshot(this.takeScreenshot(imageElement), imageElement);
+			outputSaver.getImageDownloader().saveImageFromScreenshot(this.takeScreenshot(imageElement), imageElement);
 
 			Map<String, String> outputData = new LinkedHashMap<String, String>();
 			evisionCoursePage.findChildrenElementsByXpath(evisionCoursePage.courseDetails, ".//th").forEach(element -> {
@@ -52,7 +52,7 @@ public class EvisionTest01 extends Test {
 				outputData.put(key, value);
 			});
 
-			outputSaver.saveOutputData(outputData, false);
+			outputSaver.getTextFileWriter().saveOutputData(outputData, false);
 		
 		clickOnElement(evisionCoursePage.marks);
 
@@ -121,21 +121,22 @@ public class EvisionTest01 extends Test {
 
 				while (moduleDataIterator.hasNext()) {
 					Map.Entry<String, String> moduleDataEntry = moduleDataIterator.next();
-					outputSaver.saveOutputData(moduleDataEntry, true);
+					outputSaver.getTextFileWriter().saveOutputData(moduleDataEntry, true);
 				}
 				
 				while (assessmentDataIterator.hasNext()) {
 					Map.Entry<String, String> assessmentDataEntry = assessmentDataIterator.next();
-					outputSaver.writeTabKey(true);
-					outputSaver.saveOutputData(assessmentDataEntry, true);
+					outputSaver.getTextFileWriter().writeTabKey(true);
+					outputSaver.getTextFileWriter().saveOutputData(assessmentDataEntry, true);
 				}
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (outputSaver != null) {
 				try {
-					outputSaver.closeTextWriter();
+					outputSaver.getTextFileWriter().close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

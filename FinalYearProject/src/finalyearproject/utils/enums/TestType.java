@@ -2,7 +2,8 @@ package finalyearproject.utils.enums;
 
 public enum TestType {
 	UOB ("https://www.bradford.ac.uk/external/"),
-	Evision ("https://evision.brad.ac.uk/");
+	Evision ("https://evision.brad.ac.uk/"),
+	Swaglabs ("https://www.saucedemo.com/");
 	
 	private final String url;
 	
